@@ -9,6 +9,12 @@ public class User {
 
 
 
+    private int id;
+    private String userName;
+    private int hashPassword;
+    private long cardNumber;
+
+
     public User(int id, String userName, int hashPassword, long cardNumber) {
         this.id = id;
         this.userName = userName;
@@ -41,5 +47,24 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(id, userName, hashPassword, cardNumber);
+    }
+
+
+    public int getHashPassword() {
+        return hashPassword;
+    }
+
+
+    public String getUserName() {
+        return userName;
+    }
+
+
+    public int getId() {
+        return id;
+    }
+
+    public long getCardNumber() {
+        return cardNumber;
     }
 }

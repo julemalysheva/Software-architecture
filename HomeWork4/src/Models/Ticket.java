@@ -7,6 +7,12 @@ import java.util.Date;
  */
 public class Ticket{
 
+    private int routeNumber;
+    private int place;
+    private int price;
+    private Date date;
+    private boolean isValid;
+
 
 
     public Ticket(int routeNumber, int place, int price, Date date, boolean isValid) {
@@ -64,4 +70,38 @@ public class Ticket{
         }
         return false;
     }
+
+
+    public Date getDate() {
+        return date;
+    }
+
+    public int getRouteNumber() {
+        return routeNumber;
+    }
+
+    /**
+     * Метод получения статуса билета
+     * @return
+     */
+    public boolean getValid() {
+        return isValid;
+    }
+    
+    /**
+     * Метод изменения статуса билета
+     * @param isValid
+     */
+    public void setValid(boolean isValid) {
+        this.isValid = isValid;
+    }
+
+    public int getPlace() {
+        return place;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
 }

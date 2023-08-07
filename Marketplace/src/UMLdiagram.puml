@@ -1,0 +1,170 @@
+@startuml UMLdiagram
+
+package marketplace.model {
+class User {
+- id: int
+- username: String
+- email: String
+- password: String
++ getId(): int
++ getUsername(): String
++ getEmail(): String
++ getPassword(): String
++ toString(): String
+}
+class Product {
+- id: int
+- name: String
+- description: String
+- price: double
++ getId(): int
++ getName(): String
++ getDescription(): String
++ getPrice(): double
++ toString(): String
+}
+class Order {
+- id: int
+- user: User
+- items: List<OrderItem>
+- delivered: boolean
++ getId(): int
++ getUser(): User
++ getItems(): List<OrderItem>
++ isDelivered(): boolean
++ addItem(product: Product, quantity: int): void
+}
+class OrderItem {
+- product: Product
+- quantity: int
++ getProduct(): Product
++ getQuantity(): int
+}
+class Discount {
+- id: int
+- code: String
+- percentage: double
++ getId(): int
++ getCode(): String
++ getPercentage(): double
+}
+interface Cart {
++ addItem(product: Product, quantity: int): void
++ getItems(): Map<Product, Integer>
++ getTotalAmount(): double
+}
+class CartImpl {
+- items: Map<Product, Integer>
++ addItem(product: Product, quantity: int): void
++ getItems(): Map<Product, Integer>
++ getTotalAmount(): double
+}
+interface OrderTracking {
++ trackOrder(order: Order): String
+}
+class OrderTrackingImpl {
++ trackOrder(order: Order): String
+}
+}
+
+package marketplace.service {
+interface ProductSearch {
++ searchProducts(keyword: String): List<Product>
+}
+class ProductSearchImpl {
++ searchProducts(keyword: String): List<Product>
+}
+interface PaymentGateway {
++ processPayment(amount: double): boolean
+}
+class PaymentGatewayImpl {
++ processPayment(amount: double): boolean
+}
+interface DeliveryService {
++ scheduleDelivery(order: Order): boolean
+}
+class DeliveryServiceImpl {
++ scheduleDelivery(order: Order): boolean
+}
+interface DiscountService {
++ applyDiscount(order: Order, discount: Discount): void
+}
+class DiscountServiceImpl {
++ applyDiscount(order: Order, discount: Discount): void
+}
+}
+
+package marketplace.controller {
+interface Controller {
++ registerUser(username: String, email: String, password: String): void
++ loginUser(username: String, password: String): void
++ logoutUser(): void
++ addToCart(product: Product, quantity: int): void
++ viewCart(): void
++ checkout(): void
++ trackOrder(order: Order): String
+}
+class ControllerImpl {
++ registerUser(username: String, email: String, password: String): void
++ loginUser(username: String, password: String): void
++ logoutUser(): void
++ addToCart(product: Product, quantity: int): void
++ viewCart(): void
++ checkout(): void
++ trackOrder(order: Order): String
+}
+}
+
+package marketplace.view {
+interface View {
++ displayMessage(message: String): void
++ displayErrorMessage(errorMessage: String): void
++ displayOrderConfirmation(order: Order): void
+}
+class ConsoleView {
++ displayMessage(message: String): void
++ displayErrorMessage(errorMessage: String): void
++ displayOrderConfirmation(order: Order): void
+}
+class WebView {
++ displayMessage(message: String): void
++ displayErrorMessage(errorMessage: String): void
++ displayOrderConfirmation(order: Order): void
+}
+}
+
+package marketplace.database {
+interface Database {
++ saveUser(user: User): void
++ getUserByUsername(username: String): User
++ saveProduct(product: Product): void
++ getProducts(): List<Product>
++ saveOrder(order: Order): void
++ getOrdersByUser(user: User): List<Order>
+}
+class DatabaseImpl {
++ saveUser(user: User): void
++ getUserByUsername(username: String): User
++ saveProduct(product: Product): void
++ getProducts(): List<Product>
++ saveOrder(order: Order): void
++ getOrdersByUser(user: User): List<Order>
+}
+}
+
+ConsoleView --> Controller
+Controller --> ProductSearch
+Controller --> PaymentGateway
+Controller --> DeliveryService
+Controller --> DiscountService
+Controller --> OrderTracking
+Controller --> Database
+Controller --> View
+Controller --> User
+Controller --> Order
+Controller --> Cart
+Database --> User
+Database --> Product
+Database --> Order
+
+@enduml

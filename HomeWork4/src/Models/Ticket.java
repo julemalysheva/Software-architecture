@@ -14,7 +14,6 @@ public class Ticket{
     private boolean isValid;
 
 
-
     public Ticket(int routeNumber, int place, int price, Date date, boolean isValid) {
         this.routeNumber = routeNumber;
         this.place = place;

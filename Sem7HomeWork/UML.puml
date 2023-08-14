@@ -1,0 +1,105 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+package adapter{
+class WebAdapter {
+    - IService reportService
+    ' +WebAdapter(reportService: IService) 
+    +WebAdapter(reportService: ReportService)
+    +processRequest(request: String): String
+}
+}
+
+package service{
+    interface IService{
+        +generateReport(request: String): String
+        +getSalesReport(criteria: String): String
+        +getProductStockReport(): String
+    }
+class ReportService implements IService{
+    -IReportRepo reportRepo
+    +ReportService(reportRepo: IReportRepo)
+    +generateReport(request: String): String
+    +getSalesReport(criteria: String): String
+    +getProductStockReport(): String
+}
+}
+
+package domain{
+class Category {
+    +id: int
+    +name: String
+    +getDescription(): String
+}
+
+class Subcategory {
+    +id: int
+    +categoryId: int
+    +name: String
+    +getDescription(): String
+}
+
+class ProductType {
+    +id: int
+    +name: String
+    +getDescription(): String
+}
+
+class Product {
+    +id: int
+    +subcategoryId: int
+    +productTypeId: int
+    +name: String
+    +description: String
+    +brand: String
+    +imageUrl: String
+    +availability: boolean
+    +expiryDate: LocalDate
+    +dimensions: String
+    +weight: BigDecimal
+    +price: BigDecimal
+    +calculateDiscountedPrice(discountPercentage: BigDecimal): BigDecimal
+    +getProductDetails(): String
+}
+class Sales{
+
+}
+class CustomerOrders{
+
+}
+class OrderFulfillment{
+
+}
+class CustomerShipment{
+
+}
+}
+
+package repository{
+    interface IReportRepo{
+            +fetchDataAndConvertToJson(request: String): String
+    }
+class ReportRepo implements IReportRepo{
+    +fetchDataAndConvertToJson(request: String): String
+}
+}
+
+WebAdapter --|> ReportService
+
+ReportService --|> ReportRepo
+
+Category "1" *-- "n" Subcategory
+
+Product "1" *-- "1" Subcategory
+Product "1" *-- "1" ProductType
+
+ReportService --* Product
+ReportService --* Sales
+ReportService --* CustomerOrders
+ReportService --* OrderFulfillment
+ReportService --* CustomerShipment
+
+' ReportService --|> IService
+' ReportRepo --|> IReportRepo
+
+@enduml

@@ -1,0 +1,187 @@
+@startuml booking_table
+' задаем параметры для всех классов по умолчанию
+skinparam class {
+  ' задаем светлозеленый цвет для фона классов по умолчанию
+  BackgroundColor LightGreen
+  ' задаем синий цвет для связей классов по умолчанию
+  ArrowColor      Blue
+  ' задаем красный цвет для контуров классов по умолчанию
+  BorderColor     Red
+}
+
+' задаем цвет кружочков внутри элементов по умолцанию
+skinparam stereotypeCBackgroundColor Magenta
+
+' второй вариант - пробую сгруппировать пакеты и нормально отобразить связи и интерфейсы здесь
+!define ENTITY class
+
+
+package "model" {
+    ENTITY ModelTableOrder {
+        +order: TableOrder
+        +ModelTableOrder(table: Table, customer: Customer)
+        +addPreorderedDish(dish: Dish, quantity: int): void
+        +getOrder(): TableOrder
+    }
+    package "domain"{
+    ENTITY Customer {
+        +name: String
+        +phoneNumber: String
+        +email: String
+    }
+
+    ENTITY Dish {
+        +name: String
+        +price: BigDecimal
+    }
+
+    ENTITY Hall {
+        +hallId: int
+        +name: String
+        +capacity: int
+    }
+
+    ENTITY PreorderedDish {
+        +dish: Dish
+        +quantity: int
+    }
+
+    ENTITY Table {
+        +tableId: int
+        +hall: Hall
+        +capacity: int
+    }
+
+    ENTITY TableOrder {
+        +orderId: int
+        +table: Table
+        +customer: Customer
+        +preorderedDishes: List<PreorderedDish>
+    }
+    }
+    
+}
+
+package "repo" <<Database>> {
+    interface iRepo #aliceblue ##[dotted]blue{
+        +getAllHalls(): List<Hall>
+        +getTablesInHall(hallId: int): List<Table>
+        +getAllDishes(): List<Dish>
+        +saveTableOrder(order: TableOrder): void
+    }
+
+    class Repo implements iRepo{
+        +getAllHalls(): List<Hall>
+        +getTablesInHall(hallId: int): List<Table>
+        +getAllDishes(): List<Dish>
+        +saveTableOrder(order: TableOrder): void
+    }
+}
+
+package "adapter" {
+    interface iSend #aliceblue ##[dotted]blue{
+        +sendRequest(requestData: String): String
+    }
+
+    class Send implements iSend{
+        +sendRequest(requestData: String): String
+    }
+}
+
+package "view" {
+    interface OrderView #aliceblue ##[dotted]blue{
+        +showHalls(halls: List<Hall>): void
+        +showTables(tables: List<Table>): void
+        +showDishes(dishes: List<Dish>): void
+        +showCreatedOrder(modelOrder: ModelTableOrder): void
+        +updateOrderTotal(modelOrder: ModelTableOrder): void
+        +showOrderConfirmation(): void
+    }
+
+    class OrderActivity implements OrderView{
+        -mPresenter: OrderPresenter
+        -mCurrentModelOrder: ModelTableOrder
+
+        +OrderActivity()
+        +showHalls(halls: List<Hall>): void
+        +showTables(tables: List<Table>): void
+        +showDishes(dishes: List<Dish>): void
+        +showCreatedOrder(modelOrder: ModelTableOrder): void
+        +updateOrderTotal(modelOrder: ModelTableOrder): void
+        +showOrderConfirmation(): void
+        ' // Дополнительные методы для взаимодействия с пользователем
+    }
+}
+
+package "presenter" {
+    interface OrderPresenter #aliceblue ##[dotted]blue{
+        +loadHalls(): void
+        +loadTablesInHall(hallId: int): void
+        +loadDishes(): void
+        +createOrder(table: Table, customer: Customer): void
+        +addDishToOrder(dish: Dish, quantity: int): void
+        +placeOrder(): void
+    }
+
+    class OrderPresenterImpl implements OrderPresenter{
+        -mView: OrderView
+        -mRepo: iRepo
+        -mSend: iSend
+        -mCurrentModelOrder: ModelTableOrder
+
+        +OrderPresenterImpl(view: OrderView, repo: iRepo, send: iSend)
+        +loadHalls(): void
+        +loadTablesInHall(hallId: int): void
+        +loadDishes(): void
+        +createOrder(table: Table, customer: Customer): void
+        +addDishToOrder(dish: Dish, quantity: int): void
+        +placeOrder(): void
+        -createRequestData(order: TableOrder): String
+    }
+}
+
+
+
+iSend o-- OrderPresenterImpl
+OrderView o- OrderPresenterImpl
+OrderPresenterImpl --o iRepo
+' OrderPresenterImpl -> iSend
+' OrderPresenterImpl -> OrderView
+' ??? OrderView <- OrderPresenterImpl
+
+OrderPresenterImpl --> ModelTableOrder
+
+OrderPresenterImpl ..> TableOrder
+OrderPresenterImpl ..> Table
+OrderPresenterImpl ..> Dish
+OrderPresenterImpl ..> PreorderedDish
+OrderPresenterImpl ..> Customer
+
+' Customer "1" o- "1..*" TableOrder
+' TableOrder "1..*" -o "1" Table
+TableOrder "1" o-- "0..*" PreorderedDish
+Table  "1..*" --o "1" Hall
+Dish "1..*" o- "1" PreorderedDish
+TableOrder "1..*" o-left  "1" Customer
+TableOrder "1..*" -right-o "1" Table
+
+TableOrder <. Repo
+Table <. Repo
+Dish <. Repo
+PreorderedDish <. Repo
+Customer <. Repo
+Hall <. Repo
+
+TableOrder <-- ModelTableOrder
+Table o- ModelTableOrder
+Customer o- ModelTableOrder
+
+
+OrderActivity -> OrderPresenter
+OrderActivity --> ModelTableOrder
+
+' OrderPresenter <- OrderActivity
+' OrderPresenter --> OrderPresenterImpl
+' OrderView --> OrderActivity
+
+@enduml

@@ -1,0 +1,143 @@
+@startuml booking_table
+' первоначальный вариант - пробую сгруппировать пакеты и нормально отобразить связи и интерфейсы в др. файле
+!define ENTITY class
+
+
+package "model.domain" {
+    ENTITY Customer {
+        +name: String
+        +phoneNumber: String
+        +email: String
+    }
+
+    ENTITY Dish {
+        +name: String
+        +price: BigDecimal
+    }
+
+    ENTITY Hall {
+        +hallId: int
+        +name: String
+        +capacity: int
+    }
+
+    ENTITY ModelTableOrder {
+        +order: TableOrder
+        +ModelTableOrder(table: Table, customer: Customer)
+        +addPreorderedDish(dish: Dish, quantity: int): void
+        +getOrder(): TableOrder
+    }
+
+    ENTITY PreorderedDish {
+        +dish: Dish
+        +quantity: int
+    }
+
+    ENTITY Table {
+        +tableId: int
+        +hall: Hall
+        +capacity: int
+    }
+
+    ENTITY TableOrder {
+        +orderId: int
+        +table: Table
+        +customer: Customer
+        +preorderedDishes: List<PreorderedDish>
+    }
+}
+
+package "model.repo" {
+    interface iRepo {
+        +getAllHalls(): List<Hall>
+        +getTablesInHall(hallId: int): List<Table>
+        +getAllDishes(): List<Dish>
+        +saveTableOrder(order: TableOrder): void
+    }
+
+    class Repo {
+        +getAllHalls(): List<Hall>
+        +getTablesInHall(hallId: int): List<Table>
+        +getAllDishes(): List<Dish>
+        +saveTableOrder(order: TableOrder): void
+    }
+}
+
+package "adapter" {
+    interface iSend {
+        +sendRequest(requestData: String): String
+    }
+
+    class Send {
+        +sendRequest(requestData: String): String
+    }
+}
+
+package "presenter" {
+    interface OrderPresenter {
+        +loadHalls(): void
+        +loadTablesInHall(hallId: int): void
+        +loadDishes(): void
+        +createOrder(table: Table, customer: Customer): void
+        +addDishToOrder(dish: Dish, quantity: int): void
+        +placeOrder(): void
+    }
+
+    class OrderPresenterImpl {
+        -mView: OrderView
+        -mRepo: iRepo
+        -mSend: iSend
+        -mCurrentModelOrder: ModelTableOrder
+
+        +OrderPresenterImpl(view: OrderView, repo: iRepo, send: iSend)
+        +loadHalls(): void
+        +loadTablesInHall(hallId: int): void
+        +loadDishes(): void
+        +createOrder(table: Table, customer: Customer): void
+        +addDishToOrder(dish: Dish, quantity: int): void
+        +placeOrder(): void
+        -createRequestData(order: TableOrder): String
+    }
+}
+
+package "view" {
+    interface OrderView {
+        +showHalls(halls: List<Hall>): void
+        +showTables(tables: List<Table>): void
+        +showDishes(dishes: List<Dish>): void
+        +showCreatedOrder(modelOrder: ModelTableOrder): void
+        +updateOrderTotal(modelOrder: ModelTableOrder): void
+        +showOrderConfirmation(): void
+    }
+
+    class OrderActivity {
+        -mPresenter: OrderPresenter
+        -mCurrentModelOrder: ModelTableOrder
+
+        +OrderActivity()
+        +showHalls(halls: List<Hall>): void
+        +showTables(tables: List<Table>): void
+        +showDishes(dishes: List<Dish>): void
+        +showCreatedOrder(modelOrder: ModelTableOrder): void
+        +updateOrderTotal(modelOrder: ModelTableOrder): void
+        +showOrderConfirmation(): void
+        ' // Дополнительные методы для взаимодействия с пользователем
+    }
+}
+
+App --> OrderPresenterImpl
+OrderPresenterImpl --> iRepo
+OrderPresenterImpl --> iSend
+OrderPresenterImpl --> OrderView
+OrderPresenterImpl --> ModelTableOrder
+OrderPresenterImpl --> TableOrder
+OrderPresenterImpl --> Table
+OrderPresenterImpl --> Dish
+OrderPresenterImpl --> PreorderedDish
+OrderActivity --> OrderPresenter
+OrderPresenter --> OrderPresenterImpl
+OrderView --> OrderActivity
+Repo --> iRepo
+Send --> iSend
+
+@enduml

@@ -37,7 +37,6 @@ public class App {
         repo.addDish(2, dish2);
         repo.addDish(3, dish3);
 
-        // Здесь можно продолжить добавлять данные в репозиторий по аналогии
 
         // Инициализация презентера и отображение взаимодействия
         OrderActivity view = new OrderActivity();

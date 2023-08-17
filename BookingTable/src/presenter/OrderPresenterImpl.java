@@ -12,24 +12,40 @@ import view.OrderView;
 
 import java.util.List;
 
+/**
+ * Реализация презентера заказа
+ */
 public class OrderPresenterImpl implements OrderPresenter{
-    private OrderView mView;
+    private OrderView mView; 
     private iRepo mRepo;
     private iSend mSend;
     private ModelTableOrder mCurrentModelOrder;
 
+    /**
+     * Конструктор презентера заказа
+     * @param view компонент для взаимодействия с пользователем
+     * @param repo компонент для работы с данными
+     * @param send компонент для отправки данных
+     */
     public OrderPresenterImpl(OrderView view, iRepo repo, iSend send) {
         mView = view;
         mRepo = repo;
         mSend = send;
     }
 
+    /**
+     * Получаем все залы из данных и запускаем отображение пользователю
+     */
     @Override
     public void loadHalls() {
         List<Hall> halls = mRepo.getAllHalls();
         mView.showHalls(halls);
     }
 
+    /**
+     * Загружаем все столы по выбранному залу и запускаем отображение пользователю
+     * @param hallId ID выбранного Зала
+     */
     @Override
     public void loadTablesInHall(int hallId) {
         List<Table> tables = mRepo.getTablesInHall(hallId);
@@ -71,8 +87,12 @@ public class OrderPresenterImpl implements OrderPresenter{
         mView.showOrderConfirmation();
     }
 
+    /**
+     * Создание JSON-строки на основе данных заказа
+     * @param order Данные о заказе
+     * @return данные для запроса к серверу
+     */
     private String createRequestData(TableOrder order) {
-        // Создание JSON-строки на основе данных заказа
         return ""; // Здесь может быть реализация создания JSON-строки
     }
 }

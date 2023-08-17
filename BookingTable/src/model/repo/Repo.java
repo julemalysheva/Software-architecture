@@ -11,9 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Класс для работы с БД (имитация), содержит коллекции Залов, Столов, Блюд, Хранит Заказы
+ * Класс для работы с БД (имитация), содержит коллекции Залов, Столов, Блюд, Хранит Заказы. 
+ * Реализация репозитория данных.
  */
 public class Repo implements iRepo{
+    // инициализация данных
     private Map<Integer, Hall> halls = new HashMap<>();
     private Map<Integer, Table> tables = new HashMap<>();
     private Map<Integer, Dish> dishes = new HashMap<>();
@@ -75,7 +77,6 @@ public class Repo implements iRepo{
             }
         }
         return null;
-//        return tables.stream().filter(table -> table.getTableId() == tableId).findFirst().orElse(null);
     }
 
     /**
@@ -91,8 +92,6 @@ public class Repo implements iRepo{
             }
         }
         return null;
-        // ???Или так:
-        // return dishes.stream().filter(dish -> dish.getDishId() == dishId).findFirst().orElse(null);
     }
 
     /**

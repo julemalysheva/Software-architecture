@@ -8,6 +8,9 @@ import model.domain.Dish;
 
 import java.util.List;
 
+/**
+ *  Интерфейс для представления взаимодействия с пользователем
+ */
 public interface OrderView {
     void setPresenter(OrderPresenter presenter);
     void startOrderingProcess();
